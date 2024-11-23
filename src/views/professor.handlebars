@@ -1,0 +1,158 @@
+<div class="container mt-5">
+    <!-- Nome do professor -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Bem-vindo!</h1>
+        <form action="/logout" method="POST">
+            <button class="btn btn-danger">Sair do Sistema</button>
+        </form>
+    </div>
+
+    <!-- Botão de cadastrar turma -->
+    <div class="mb-4">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastrarTurmaModal">Cadastrar Turma</button>
+    </div>
+
+    <!-- Listagem de turmas -->
+    <h2>Turmas Cadastradas</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome da Turma</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#if turmas.length}}
+                    {{#each turmas}}
+                    <tr>
+                        <td>{{@index}}</td>
+                        <td>{{this.nome}}</td>
+                        <td>
+                            <!-- Botão de exclusão com modal de confirmação -->
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarExclusaoModal" onclick="setTurmaId({{this.id}}, '{{this.nome}}')">Excluir</button>
+                            <!-- Botão para visualizar as atividades da turma -->
+                            <button class="btn btn-info btn-sm" onclick="visualizarTurma({{this.id}})">Visualizar</button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                {{else}}
+                    <tr>
+                        <td colspan="3" class="text-center">Nenhuma turma cadastrada.</td>
+                    </tr>
+                {{/if}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para cadastrar turma -->
+<div class="modal fade" id="cadastrarTurmaModal" tabindex="-1" aria-labelledby="cadastrarTurmaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarTurmaModalLabel">Cadastrar Nova Turma</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/professor" method="POST" id="cadastrarTurmaForm">
+                    <div class="mb-3">
+                        <label for="nomeTurma" class="form-label">Nome da Turma</label>
+                        <input type="text" id="nomeTurma" name="nome" class="form-control" placeholder="Digite o nome da turma" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="confirmarExclusaoModal" tabindex="-1" aria-labelledby="confirmarExclusaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarExclusaoModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a turma <strong id="nomeTurmaExclusao"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="excluirTurmaBtn">Sim, Excluir</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Função para setar os dados da turma no modal de exclusão
+function setTurmaId(id, nome) {
+    // Atualiza o nome da turma no modal
+    document.getElementById('nomeTurmaExclusao').innerText = nome;
+    // Atualiza o evento do botão de exclusão para chamar a função de exclusão com o ID correto
+    document.getElementById('excluirTurmaBtn').onclick = function() {
+        excluirTurma(id); // Chama a função de exclusão
+    };
+}
+
+async function excluirTurma(id) {
+    try {
+        // Envia a requisição de exclusão via DELETE
+        const response = await fetch(`/excluir-turma/${id}`, {
+            method: 'DELETE', // Método DELETE
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao excluir a turma');
+        }
+
+        location.reload(); // Recarrega a página para refletir a exclusão
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao excluir a turma');
+    }
+}
+
+// Função para visualizar as atividades de uma turma
+function visualizarTurma(id) {
+    // Redireciona para a URL de atividades da turma com o ID especificado
+    window.location.href = `http://localhost:3001/turmas/${id}/atividades`;
+}
+
+// Função para enviar o formulário de cadastro via AJAX
+document.getElementById('cadastrarTurmaForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Previne o envio normal do formulário
+    const nomeTurma = document.getElementById('nomeTurma').value; // Captura o nome da turma
+
+    if (nomeTurma) {
+        cadastrarTurma(nomeTurma); // Chama a função para cadastrar a turma
+    } else {
+        alert('Por favor, insira o nome da turma.');
+    }
+});
+
+async function cadastrarTurma(nome) {
+    try {
+        const response = await fetch('/professor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nome: nome }) // Envia o nome da turma como JSON
+        });
+        
+        const turma = await response.json(); // Obtemos a turma criada do backend
+        alert('Turma cadastrada com sucesso!');
+        location.reload(); // Recarrega a lista de turmas
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao cadastrar a turma');
+    }
+}
+</script>

@@ -1,0 +1,66 @@
+<!-- atividades.handlebars -->
+<div class="container mt-5">
+    <!-- Exibindo informações da turma e nome do professor -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Atividades da Turma: {{turma.nome}}</h1>
+        <h5>Professor: {{professor.nome}}</h5>
+        <!-- Botão Sair -->
+        <form action="/logout" method="POST">
+            <button class="btn btn-danger">Sair do Sistema</button>
+        </form>
+    </div>
+
+    <!-- Botão para cadastrar atividade -->
+    <div class="mb-4">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastrarAtividadeModal">Cadastrar Atividade</button>
+    </div>
+
+    <!-- Listagem de atividades -->
+    <h2>Atividades Cadastradas</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#if atividades.length}}
+                    {{#each atividades}}
+                    <tr>
+                        <td>{{@index}}</td>
+                        <td>{{this.descricao}}</td>
+                    </tr>
+                    {{/each}}
+                {{else}}
+                    <tr>
+                        <td colspan="2" class="text-center">Nenhuma atividade cadastrada.</td>
+                    </tr>
+                {{/if}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para cadastrar atividade -->
+<div class="modal fade" id="cadastrarAtividadeModal" tabindex="-1" aria-labelledby="cadastrarAtividadeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastrarAtividadeModalLabel">Cadastrar Nova Atividade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/cadastrar-atividade" method="POST" id="cadastrarAtividadeForm">
+                    <input type="hidden" name="turmaId" value="{{turma.id}}">
+                    <div class="mb-3">
+                        <label for="descricaoAtividade" class="form-label">Descrição da Atividade</label>
+                        <textarea id="descricaoAtividade" name="descricao" class="form-control" placeholder="Digite a descrição da atividade" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
