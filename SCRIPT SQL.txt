@@ -1,0 +1,57 @@
+create database saep_db;
+
+use saep_db;
+
+-- Criando a tabela Usuarios
+CREATE TABLE Usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  senha VARCHAR(255) NOT NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Criando a tabela Turmas
+CREATE TABLE Turmas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
+  id_professor INT NOT NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_professor) REFERENCES Usuarios(id) -- Supondo que o professor é um usuário
+);
+
+-- Criando a tabela Atividades
+CREATE TABLE Atividades (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  descricao VARCHAR(255) NOT NULL,
+  id_turma INT NOT NULL,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_turma) REFERENCES Turmas(id) -- A atividade pertence a uma turma
+);
+
+-- Inserção na tabela Usuarios
+INSERT INTO Usuarios (nome, email, senha, createdAt, updatedAt)
+VALUES 
+('João Silva', 'joao.silva@email.com', '$2b$10$0bqDljI6pQ46uRGHtrghp.OjItEk2xhSRgcsfdtS9RG9D2PL9QHNa', NOW(), NOW()),
+('Maria Oliveira', 'maria.oliveira@email.com', '$2b$10$HzfXa8GOMIjLRj18qGXO8OZh7/cq/5z.h2rjEkT6YJY.6Hlhzv9Pq', NOW(), NOW()),
+('Carlos Souza', 'carlos.souza@email.com', '$2b$10$gz0YorwARaD06bzYxi5Cqu3JhT9bWChUUSPOddS3ZZqC5lAsHvmqe', NOW(), NOW()),
+('Ana Costa', 'ana.costa@email.com', '$2b$10$xy1OX1Iq51mx6oHk4J3O6e5mwe8bmAAlMnYWl0qbLfS9TkZ1iP/ii', NOW(), NOW());
+
+-- Inserção na tabela Turmas
+INSERT INTO Turmas (nome, id_professor, createdAt, updatedAt)
+VALUES 
+('Matemática 101', 1, NOW(), NOW()),
+('Física 101', 2, NOW(), NOW()),
+('Química 101', 3, NOW(), NOW()),
+('História 101', 4, NOW(), NOW());
+
+-- Inserção na tabela Atividades
+INSERT INTO Atividades (descricao, id_turma, createdAt, updatedAt)
+VALUES 
+('Atividade 1: Cálculos básicos', 1, NOW(), NOW()),
+('Atividade 2: Leitura e interpretação de gráficos', 2, NOW(), NOW()),
+('Atividade 3: Reações químicas e experimentos', 3, NOW(), NOW()),
+('Atividade 4: Estudo sobre as civilizações antigas', 4, NOW(), NOW());

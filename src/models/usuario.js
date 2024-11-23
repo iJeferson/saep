@@ -1,7 +1,7 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     /**
@@ -13,13 +13,31 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Usuario.init({
-    nome: DataTypes.STRING,
-    email: DataTypes.STRING,
-    senha: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Usuario',
-  });
+
+  Usuario.init(
+    {
+      nome: DataTypes.STRING,
+      email: DataTypes.STRING,
+      senha: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: 'Usuario',
+      hooks: {
+        // Hook para encriptar a senha antes de criar o usuário
+        async beforeCreate(usuario) {
+          const salt = await bcrypt.genSalt(10); 
+          usuario.senha = await bcrypt.hash(usuario.senha, salt); 
+        },
+        async beforeUpdate(usuario) {
+          if (usuario.changed('senha')) {
+            const salt = await bcrypt.genSalt(10);
+            usuario.senha = await bcrypt.hash(usuario.senha, salt);
+          }
+        },
+      },
+    }
+  );
+
   return Usuario;
 };

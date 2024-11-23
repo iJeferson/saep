@@ -1,0 +1,22 @@
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4">Login</h3>
+        <!-- Formulário ajustado para consumir a rota POST /login -->
+        <form id="loginForm" action="/login" method="POST">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Digite seu email" required>
+                <div class="invalid-feedback">Por favor, insira um email válido.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" id="password" name="senha" class="form-control" placeholder="Digite sua senha" required>
+                <div class="invalid-feedback">A senha é obrigatória.</div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Autenticar</button>
+            {{#if error}}
+                <div id="errorMessage" class="text-danger mt-3">{{error}}</div>
+            {{/if}}
+        </form>
+    </div>
+</div>
